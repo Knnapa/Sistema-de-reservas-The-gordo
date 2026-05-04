@@ -203,7 +203,8 @@ function Home() {
           📞 +57 300 45306404 · 📍 Carrera 19 # 11 - 07 Bucaramanga, Colombia
         </p>
         <p className="text-sm opacity-80 mt-1">
-          Lunes a viernes · 04:00 p.m – 12.30 am · Sábados y domingos · 04:00 pm – 01:30 am
+          Lunes a viernes · 04:00 p.m – 12.30 am · Sábados y domingos · 04:00 pm
+          – 01:30 am
         </p>
       </footer>
     </div>
