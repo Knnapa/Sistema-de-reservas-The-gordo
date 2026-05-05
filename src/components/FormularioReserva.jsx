@@ -25,6 +25,7 @@ function FormularioReserva({ mesa, onCerrar, onExito }) {
     hora: "",
     num_personas: "",
     cliente_nombre: "",
+    cliente_apellido: "", 
     cliente_tel: "",
     cliente_email: "",
   });
@@ -60,18 +61,21 @@ function FormularioReserva({ mesa, onCerrar, onExito }) {
   };
 
   const formularioValido = () => {
-    const emailValido = /^[^@]+@[^@]+\.[^@]+$/.test(form.cliente_email);
-    return (
-      form.fecha &&
-      form.hora &&
-      form.num_personas &&
-      form.cliente_nombre &&
-      form.cliente_tel &&
-      emailValido &&
-      Number(form.num_personas) <= mesa.capacidad &&
-      Number(form.num_personas) > 0
-    );
-  };
+  const emailValido = /^[^@]+@[^@]+\.[^@]+$/.test(form.cliente_email);
+  const telValido = form.cliente_tel.length === 10;  
+  
+  return (
+    form.fecha &&
+    form.hora &&
+    form.num_personas &&
+    form.cliente_nombre &&
+    form.cliente_apellido && 
+    telValido &&          
+    emailValido &&
+    Number(form.num_personas) <= mesa.capacidad &&
+    Number(form.num_personas) > 0
+  );
+};
 
   const handleSubmit = async () => {
     setLoading(true);
@@ -95,7 +99,7 @@ function FormularioReserva({ mesa, onCerrar, onExito }) {
         fecha: form.fecha,
         hora: form.hora + ":00",
         num_personas: Number(form.num_personas),
-        cliente_nombre: form.cliente_nombre,
+        cliente_nombre: `${form.cliente_nombre} ${form.cliente_apellido}`, 
         cliente_tel: form.cliente_tel,
         cliente_email: form.cliente_email,
         estado: "activa",
@@ -124,7 +128,7 @@ function FormularioReserva({ mesa, onCerrar, onExito }) {
 
   if (confirmado) {
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4">
+      <div className="fixed inset-0 flex items-center justify-center z-50 px-4 backdrop-blur-sm bg-white/10">
         <div className="bg-white rounded-2xl p-8 w-full max-w-md text-center shadow-2xl">
           <div className="text-green-500 text-6xl mb-4">✓</div>
           <h2 className="text-2xl font-bold text-teal mb-2">
@@ -162,7 +166,7 @@ function FormularioReserva({ mesa, onCerrar, onExito }) {
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4">
+    <div className="fixed inset-0 flex items-center justify-center z-50 px-4 backdrop-blur-sm bg-white/10">
       <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl max-h-screen overflow-y-auto">
         <h2 className="text-xl font-bold text-teal mb-1">
           Reservar Mesa #{mesa.numero}
@@ -208,32 +212,65 @@ function FormularioReserva({ mesa, onCerrar, onExito }) {
           </div>
 
           <div>
-            <label className="text-xs text-gray-500 block mb-1">
-              Número de personas (máx. {mesa.capacidad})
-            </label>
-            <input
-              type="number"
-              name="num_personas"
-              min="1"
-              max={mesa.capacidad}
-              value={form.num_personas}
-              onChange={handleChange}
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-cyan"
-            />
-          </div>
+          <label className="text-xs text-gray-500 block mb-1">
+            Número de personas (máx. {mesa.capacidad})
+          </label>
+          <input
+            type="number"
+            name="num_personas"
+            min="1"
+            max={mesa.capacidad}
+            value={form.num_personas}
+            onChange={handleChange}
+            placeholder={`Entre 1 y ${mesa.capacidad}`}
+            className={`w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-cyan transition-colors ${
+              form.num_personas && (Number(form.num_personas) < 1 || Number(form.num_personas) > mesa.capacidad)
+                ? "border-red-400 bg-red-50"
+                : "border-gray-200"
+            }`}
+          />
+          {form.num_personas && Number(form.num_personas) < 1 && (
+            <p className="text-red-500 text-xs mt-1">
+              El mínimo es 1 persona.
+            </p>
+          )}
+          {form.num_personas && Number(form.num_personas) > mesa.capacidad && (
+            <p className="text-red-500 text-xs mt-1">
+              Esta mesa tiene capacidad máxima de {mesa.capacidad} personas.
+            </p>
+          )}
+          {form.num_personas && Number(form.num_personas) >= 1 && Number(form.num_personas) <= mesa.capacidad && (
+            <p className="text-green-500 text-xs mt-1">
+              ✓ {form.num_personas} persona{Number(form.num_personas) > 1 ? "s" : ""} confirmada{Number(form.num_personas) > 1 ? "s" : ""}.
+            </p>
+          )}
+        </div>
 
-          <div>
-            <label className="text-xs text-gray-500 block mb-1">
-              Nombre completo
-            </label>
-            <input
-              type="text"
-              name="cliente_nombre"
-              value={form.cliente_nombre}
-              onChange={handleChange}
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-cyan"
-            />
-          </div>
+        <div className="flex gap-3">
+        <div className="flex-1">
+          <label className="text-xs text-gray-500 block mb-1">Nombre</label>
+          <input
+            type="text"
+            name="cliente_nombre"
+            value={form.cliente_nombre}
+            onChange={handleChange}
+            placeholder="Ej: Juan"
+            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-cyan"
+          />
+        </div>
+        
+        <div className="flex-1">
+          <label className="text-xs text-gray-500 block mb-1">Apellido</label>
+          <input
+            type="text"
+            name="cliente_apellido"
+            value={form.cliente_apellido}
+            onChange={handleChange}
+            placeholder="Ej: Pérez"
+            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-cyan"
+          />
+        </div>
+      </div>
 
           <div>
             <label className="text-xs text-gray-500 block mb-1">Teléfono</label>
@@ -241,9 +278,33 @@ function FormularioReserva({ mesa, onCerrar, onExito }) {
               type="tel"
               name="cliente_tel"
               value={form.cliente_tel}
-              onChange={handleChange}
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-cyan"
+              onChange={(e) => {
+                const soloNumeros = e.target.value.replace(/\D/g, "").slice(0, 10);
+                setForm({ ...form, cliente_tel: soloNumeros });
+                setError("");
+              }}
+              placeholder="Ej: 3001234567"
+              maxLength={10}
+              className={`w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-cyan transition-colors ${
+                form.cliente_tel && form.cliente_tel.length < 10
+                  ? "border-red-400 bg-red-50"
+                  : form.cliente_tel.length === 10
+                  ? "border-green-400"
+                  : "border-gray-200"
+              }`}
             />
+
+            {form.cliente_tel.length > 0 && form.cliente_tel.length < 10 && (
+              <p className="text-red-500 text-xs mt-1">
+                El teléfono debe tener 10 dígitos. Te faltan {10 - form.cliente_tel.length}.
+              </p>
+            )}
+
+            {form.cliente_tel.length === 10 && (
+              <p className="text-green-500 text-xs mt-1">
+                ✓ Teléfono válido.
+              </p>
+            )}
           </div>
 
           <div>
@@ -255,10 +316,28 @@ function FormularioReserva({ mesa, onCerrar, onExito }) {
               name="cliente_email"
               value={form.cliente_email}
               onChange={handleChange}
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-cyan"
+              placeholder="Ej: juan@correo.com"
+              className={`w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-cyan transition-colors ${
+                form.cliente_email && !/^[^@]+@[^@]+\.[^@]+$/.test(form.cliente_email)
+                  ? "border-red-400 bg-red-50"
+                  : form.cliente_email && /^[^@]+@[^@]+\.[^@]+$/.test(form.cliente_email)
+                  ? "border-green-400"
+                  : "border-gray-200"
+              }`}
             />
+
+            {form.cliente_email && !/^[^@]+@[^@]+\.[^@]+$/.test(form.cliente_email) && (
+              <p className="text-red-500 text-xs mt-1">
+                Ingresa un correo válido. Ej: juan@correo.com
+              </p>
+            )}
+
+            {form.cliente_email && /^[^@]+@[^@]+\.[^@]+$/.test(form.cliente_email) && (
+              <p className="text-green-500 text-xs mt-1">
+                ✓ Correo válido.
+              </p>
+            )}
           </div>
-        </div>
 
         {error && <p className="text-red-500 text-sm mt-3">{error}</p>}
 
@@ -280,6 +359,7 @@ function FormularioReserva({ mesa, onCerrar, onExito }) {
           >
             Cancelar
           </button>
+        </div>
         </div>
       </div>
     </div>
