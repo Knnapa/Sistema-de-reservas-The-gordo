@@ -1,4 +1,5 @@
 // src/pages/admin/Login.jsx
+import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import logo from "../../assets/logo.jpg";
 
@@ -13,6 +14,7 @@ function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleLogin = () => {
     // Limpiar error anterior
@@ -25,7 +27,7 @@ function Login() {
         // Guardar en localStorage que el admin está autenticado
         localStorage.setItem("admin_auth", "true");
         // Redirigir al dashboard
-        window.location.href = "/admin/dashboard";
+        navigate("/admin/mesas");
       } else {
         setError("Usuario o contraseña incorrectos. Intenta de nuevo.");
         setLoading(false);
