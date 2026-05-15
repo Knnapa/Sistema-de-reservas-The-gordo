@@ -10,11 +10,7 @@ function Home() {
   const [mesaSeleccionada, setMesaSeleccionada] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    cargarMesas();
-  }, []);
-
-  const cargarMesas = async () => {
+  async function cargarMesas() {
     try {
       const data = await getMesas();
       setMesas(data);
@@ -23,7 +19,11 @@ function Home() {
     } finally {
       setLoading(false);
     }
-  };
+  }
+
+  useEffect(() => {
+    void Promise.resolve().then(cargarMesas);
+  }, []);
 
   const handleClickMesa = (mesa) => {
     if (mesa.estado === "disponible") {

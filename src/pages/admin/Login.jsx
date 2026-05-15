@@ -2,37 +2,26 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import logo from "../../assets/logo.jpg";
-
-// Credenciales del administrador
-// IMPORTANTE: En producción real esto iría en Supabase Auth,
-// pero para este proyecto lo dejamos simple así
-const ADMIN_USER = "admin";
-const ADMIN_PASS = "gordo2024";
+import { signInAdmin } from "../../services/adminAuthService";
 
 function Login() {
-  const [usuario, setUsuario] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleLogin = () => {
-    // Limpiar error anterior
+  const handleLogin = async () => {
     setError("");
     setLoading(true);
 
-    // Simular pequeño delay para que se vea el loading
-    setTimeout(() => {
-      if (usuario === ADMIN_USER && password === ADMIN_PASS) {
-        // Guardar en localStorage que el admin está autenticado
-        localStorage.setItem("admin_auth", "true");
-        // Redirigir al dashboard
-        navigate("/admin/mesas");
-      } else {
-        setError("Usuario o contraseña incorrectos. Intenta de nuevo.");
-        setLoading(false);
-      }
-    }, 500);
+    try {
+      await signInAdmin(email, password);
+      navigate("/admin/dashboard");
+    } catch (error) {
+      setError(error.message);
+      setLoading(false);
+    }
   };
 
   // Permitir enviar con la tecla Enter
@@ -59,17 +48,17 @@ function Login() {
         <div className="space-y-4">
           <div>
             <label className="text-xs text-gray-500 block mb-1 font-medium">
-              Usuario
+              Correo
             </label>
             <input
-              type="text"
-              value={usuario}
+              type="email"
+              value={email}
               onChange={(e) => {
-                setUsuario(e.target.value);
+                setEmail(e.target.value);
                 setError("");
               }}
               onKeyDown={handleKeyDown}
-              placeholder="Ingresa tu usuario"
+              placeholder="admin@thegordo.com"
               className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-cyan focus:ring-1 focus:ring-cyan transition-colors"
             />
           </div>
@@ -101,9 +90,9 @@ function Login() {
           {/* Botón de ingreso */}
           <button
             onClick={handleLogin}
-            disabled={loading || !usuario || !password}
+            disabled={loading || !email || !password}
             className={`w-full py-3 rounded-xl font-semibold text-white transition-colors mt-2 ${
-              loading || !usuario || !password
+              loading || !email || !password
                 ? "bg-gray-300 cursor-not-allowed"
                 : "bg-cyan hover:bg-teal cursor-pointer"
             }`}
