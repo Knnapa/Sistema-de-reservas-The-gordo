@@ -43,13 +43,20 @@ function FormularioReserva({ mesa, onCerrar, onExito }) {
     const horas = [];
     const esFinDeSemana = dia === "sábado" || dia === "domingo";
 
-    for (let h = 16; h <= 23; h++) {
+    const horaInicio = horario.hora_inicio?.slice(0, 5) || "16:00";
+    const horaFin =
+      horario.hora_fin?.slice(0, 5) || (esFinDeSemana ? "01:30" : "00:30");
+    const [inicioHora] = horaInicio.split(":").map(Number);
+    const [finHora] = horaFin.split(":").map(Number);
+
+    for (let h = inicioHora; h <= 23; h++) {
       horas.push(`${String(h).padStart(2, "0")}:00`);
     }
 
-    if (esFinDeSemana) {
-      horas.push("00:00");
-      horas.push("01:00");
+    if (finHora < inicioHora) {
+      for (let h = 0; h <= finHora; h++) {
+        horas.push(`${String(h).padStart(2, "0")}:00`);
+      }
     }
 
     return horas;
@@ -105,7 +112,7 @@ function FormularioReserva({ mesa, onCerrar, onExito }) {
         estado: "activa",
       };
 
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from("reservas")
         .insert([datosReserva])
         .select()
