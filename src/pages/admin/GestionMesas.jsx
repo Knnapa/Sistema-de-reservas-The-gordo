@@ -6,18 +6,11 @@ import {
   updateMesa,
   cambiarEstadoMesa,
 } from "../../services/mesasService";
-
-// Guard: si no está autenticado, redirigir al login
-function useAdminGuard() {
-  useEffect(() => {
-    if (!localStorage.getItem("admin_auth")) {
-      window.location.href = "/admin";
-    }
-  }, []);
-}
+import AdminLayout from "../../components/AdminLayout";
+import useAdminGuard from "../../hooks/useAdminGuard";
 
 function GestionMesas() {
-  useAdminGuard();
+  const checkingAuth = useAdminGuard();
 
   const [mesas, setMesas] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -37,11 +30,7 @@ function GestionMesas() {
   const [loadingModal, setLoadingModal] = useState(false);
 
   // Cargar mesas al iniciar
-  useEffect(() => {
-    cargarMesas();
-  }, []);
-
-  const cargarMesas = async () => {
+  async function cargarMesas() {
     try {
       setLoading(true);
       const data = await getMesas();
@@ -51,7 +40,11 @@ function GestionMesas() {
     } finally {
       setLoading(false);
     }
-  };
+  }
+
+  useEffect(() => {
+    void Promise.resolve().then(cargarMesas);
+  }, []);
 
   // Abrir modal para CREAR una mesa nueva (formulario vacío)
   const abrirCrear = () => {
@@ -163,14 +156,17 @@ function GestionMesas() {
   const bloqueadas = mesas.filter((m) => m.estado === "bloqueada").length;
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
+    <AdminLayout active="mesas">
+      {checkingAuth && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white">
+          <div className="animate-spin rounded-full h-10 w-10 border-4 border-cyan border-t-transparent"></div>
+        </div>
+      )}
+      <div className="p-6">
       {/* Encabezado */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-chocolate">Gestión de Mesas</h1>
-          <p className="text-gray-400 text-sm mt-1">
-            Administra las mesas del restaurante
-          </p>
+          
         </div>
         <button
           onClick={abrirCrear}
@@ -362,7 +358,8 @@ function GestionMesas() {
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </AdminLayout>
   );
 }
 
