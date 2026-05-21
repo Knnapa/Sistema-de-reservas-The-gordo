@@ -25,7 +25,7 @@ function FormularioReserva({ mesa, onCerrar, onExito }) {
     hora: "",
     num_personas: "",
     cliente_nombre: "",
-    cliente_apellido: "", 
+    cliente_apellido: "",
     cliente_tel: "",
     cliente_email: "",
   });
@@ -68,21 +68,21 @@ function FormularioReserva({ mesa, onCerrar, onExito }) {
   };
 
   const formularioValido = () => {
-  const emailValido = /^[^@]+@[^@]+\.[^@]+$/.test(form.cliente_email);
-  const telValido = form.cliente_tel.length === 10;  
-  
-  return (
-    form.fecha &&
-    form.hora &&
-    form.num_personas &&
-    form.cliente_nombre &&
-    form.cliente_apellido && 
-    telValido &&          
-    emailValido &&
-    Number(form.num_personas) <= mesa.capacidad &&
-    Number(form.num_personas) > 0
-  );
-};
+    const emailValido = /^[^@]+@[^@]+\.[^@]+$/.test(form.cliente_email);
+    const telValido = form.cliente_tel.length === 10;
+
+    return (
+      form.fecha &&
+      form.hora &&
+      form.num_personas &&
+      form.cliente_nombre &&
+      form.cliente_apellido &&
+      telValido &&
+      emailValido &&
+      Number(form.num_personas) <= mesa.capacidad &&
+      Number(form.num_personas) > 0
+    );
+  };
 
   const handleSubmit = async () => {
     setLoading(true);
@@ -106,7 +106,7 @@ function FormularioReserva({ mesa, onCerrar, onExito }) {
         fecha: form.fecha,
         hora: form.hora + ":00",
         num_personas: Number(form.num_personas),
-        cliente_nombre: `${form.cliente_nombre} ${form.cliente_apellido}`, 
+        cliente_nombre: `${form.cliente_nombre} ${form.cliente_apellido}`,
         cliente_tel: form.cliente_tel,
         cliente_email: form.cliente_email,
         estado: "activa",
@@ -122,12 +122,13 @@ function FormularioReserva({ mesa, onCerrar, onExito }) {
       setConfirmado(true);
     } catch (err) {
       console.error("Error:", err);
-      setError(
-        err.message ===
-          "La hora elegida está fuera del horario habilitado para ese día"
-          ? "Esa hora está fuera del horario del restaurante. Selecciona entre 4:00 pm y 12:30 am."
-          : "Ocurrió un error al confirmar la reserva. Intenta de nuevo.",
-      );
+      if (err.message?.includes("fuera del horario") || err.code === "23514") {
+        setError("Esa hora está fuera del horario del restaurante. Selecciona entre 4:00 pm y 12:30 am.");
+      } else if (err.code === "23505") {
+        setError("Esta mesa ya fue reservada en ese horario. Por favor elige otra mesa u horario.");
+      } else {
+        setError(`Ocurrió un error al confirmar la reserva: ${err.message || "Intenta de nuevo."}`);
+      }
     } finally {
       setLoading(false);
     }
@@ -219,65 +220,65 @@ function FormularioReserva({ mesa, onCerrar, onExito }) {
           </div>
 
           <div>
-          <label className="text-xs text-gray-500 block mb-1">
-            Número de personas (máx. {mesa.capacidad})
-          </label>
-          <input
-            type="number"
-            name="num_personas"
-            min="1"
-            max={mesa.capacidad}
-            value={form.num_personas}
-            onChange={handleChange}
-            placeholder={`Entre 1 y ${mesa.capacidad}`}
-            className={`w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-cyan transition-colors ${
-              form.num_personas && (Number(form.num_personas) < 1 || Number(form.num_personas) > mesa.capacidad)
-                ? "border-red-400 bg-red-50"
-                : "border-gray-200"
-            }`}
-          />
-          {form.num_personas && Number(form.num_personas) < 1 && (
-            <p className="text-red-500 text-xs mt-1">
-              El mínimo es 1 persona.
-            </p>
-          )}
-          {form.num_personas && Number(form.num_personas) > mesa.capacidad && (
-            <p className="text-red-500 text-xs mt-1">
-              Esta mesa tiene capacidad máxima de {mesa.capacidad} personas.
-            </p>
-          )}
-          {form.num_personas && Number(form.num_personas) >= 1 && Number(form.num_personas) <= mesa.capacidad && (
-            <p className="text-green-500 text-xs mt-1">
-              ✓ {form.num_personas} persona{Number(form.num_personas) > 1 ? "s" : ""} confirmada{Number(form.num_personas) > 1 ? "s" : ""}.
-            </p>
-          )}
-        </div>
+            <label className="text-xs text-gray-500 block mb-1">
+              Número de personas (máx. {mesa.capacidad})
+            </label>
+            <input
+              type="number"
+              name="num_personas"
+              min="1"
+              max={mesa.capacidad}
+              value={form.num_personas}
+              onChange={handleChange}
+              placeholder={`Entre 1 y ${mesa.capacidad}`}
+              className={`w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-cyan transition-colors ${
+                form.num_personas && (Number(form.num_personas) < 1 || Number(form.num_personas) > mesa.capacidad)
+                  ? "border-red-400 bg-red-50"
+                  : "border-gray-200"
+              }`}
+            />
+            {form.num_personas && Number(form.num_personas) < 1 && (
+              <p className="text-red-500 text-xs mt-1">
+                El mínimo es 1 persona.
+              </p>
+            )}
+            {form.num_personas && Number(form.num_personas) > mesa.capacidad && (
+              <p className="text-red-500 text-xs mt-1">
+                Esta mesa tiene capacidad máxima de {mesa.capacidad} personas.
+              </p>
+            )}
+            {form.num_personas && Number(form.num_personas) >= 1 && Number(form.num_personas) <= mesa.capacidad && (
+              <p className="text-green-500 text-xs mt-1">
+                ✓ {form.num_personas} persona{Number(form.num_personas) > 1 ? "s" : ""} confirmada{Number(form.num_personas) > 1 ? "s" : ""}.
+              </p>
+            )}
+          </div>
 
-        <div className="flex gap-3">
-        <div className="flex-1">
-          <label className="text-xs text-gray-500 block mb-1">Nombre</label>
-          <input
-            type="text"
-            name="cliente_nombre"
-            value={form.cliente_nombre}
-            onChange={handleChange}
-            placeholder="Ej: Juan"
-            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-cyan"
-          />
-        </div>
-        
-        <div className="flex-1">
-          <label className="text-xs text-gray-500 block mb-1">Apellido</label>
-          <input
-            type="text"
-            name="cliente_apellido"
-            value={form.cliente_apellido}
-            onChange={handleChange}
-            placeholder="Ej: Pérez"
-            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-cyan"
-          />
-        </div>
-      </div>
+          <div className="flex gap-3">
+            <div className="flex-1">
+              <label className="text-xs text-gray-500 block mb-1">Nombre</label>
+              <input
+                type="text"
+                name="cliente_nombre"
+                value={form.cliente_nombre}
+                onChange={handleChange}
+                placeholder="Ej: Juan"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-cyan"
+              />
+            </div>
+
+            <div className="flex-1">
+              <label className="text-xs text-gray-500 block mb-1">Apellido</label>
+              <input
+                type="text"
+                name="cliente_apellido"
+                value={form.cliente_apellido}
+                onChange={handleChange}
+                placeholder="Ej: Pérez"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-cyan"
+              />
+            </div>
+          </div>
 
           <div>
             <label className="text-xs text-gray-500 block mb-1">Teléfono</label>
@@ -300,13 +301,11 @@ function FormularioReserva({ mesa, onCerrar, onExito }) {
                   : "border-gray-200"
               }`}
             />
-
             {form.cliente_tel.length > 0 && form.cliente_tel.length < 10 && (
               <p className="text-red-500 text-xs mt-1">
                 El teléfono debe tener 10 dígitos. Te faltan {10 - form.cliente_tel.length}.
               </p>
             )}
-
             {form.cliente_tel.length === 10 && (
               <p className="text-green-500 text-xs mt-1">
                 ✓ Teléfono válido.
@@ -332,13 +331,11 @@ function FormularioReserva({ mesa, onCerrar, onExito }) {
                   : "border-gray-200"
               }`}
             />
-
             {form.cliente_email && !/^[^@]+@[^@]+\.[^@]+$/.test(form.cliente_email) && (
               <p className="text-red-500 text-xs mt-1">
                 Ingresa un correo válido. Ej: juan@correo.com
               </p>
             )}
-
             {form.cliente_email && /^[^@]+@[^@]+\.[^@]+$/.test(form.cliente_email) && (
               <p className="text-green-500 text-xs mt-1">
                 ✓ Correo válido.
@@ -346,27 +343,27 @@ function FormularioReserva({ mesa, onCerrar, onExito }) {
             )}
           </div>
 
-        {error && <p className="text-red-500 text-sm mt-3">{error}</p>}
+          {error && <p className="text-red-500 text-sm mt-3">{error}</p>}
 
-        <div className="flex gap-3 mt-5">
-          <button
-            onClick={handleSubmit}
-            disabled={!formularioValido() || loading}
-            className={`flex-1 py-3 rounded-xl font-semibold text-white transition-colors ${
-              formularioValido() && !loading
-                ? "bg-cyan hover:bg-teal cursor-pointer"
-                : "bg-gray-300 cursor-not-allowed"
-            }`}
-          >
-            {loading ? "Confirmando..." : "Confirmar reserva"}
-          </button>
-          <button
-            onClick={onCerrar}
-            className="flex-1 py-3 rounded-xl font-semibold bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
-          >
-            Cancelar
-          </button>
-        </div>
+          <div className="flex gap-3 mt-5">
+            <button
+              onClick={handleSubmit}
+              disabled={!formularioValido() || loading}
+              className={`flex-1 py-3 rounded-xl font-semibold text-white transition-colors ${
+                formularioValido() && !loading
+                  ? "bg-cyan hover:bg-teal cursor-pointer"
+                  : "bg-gray-300 cursor-not-allowed"
+              }`}
+            >
+              {loading ? "Confirmando..." : "Confirmar reserva"}
+            </button>
+            <button
+              onClick={onCerrar}
+              className="flex-1 py-3 rounded-xl font-semibold bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
+            >
+              Cancelar
+            </button>
+          </div>
         </div>
       </div>
     </div>
