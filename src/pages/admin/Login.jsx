@@ -1,5 +1,5 @@
 // src/pages/admin/Login.jsx
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useState } from "react";
 import logo from "../../assets/logo.jpg";
 import { signInAdmin } from "../../services/adminAuthService";
@@ -10,6 +10,8 @@ function Login() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const sesionExpirada = searchParams.get("razon") === "inactividad";
 
   const handleLogin = async () => {
     setError("");
@@ -24,7 +26,6 @@ function Login() {
     }
   };
 
-  // Permitir enviar con la tecla Enter
   const handleKeyDown = (e) => {
     if (e.key === "Enter") handleLogin();
   };
@@ -43,6 +44,14 @@ function Login() {
           <h1 className="text-2xl font-bold text-chocolate">The Gordo</h1>
           <p className="text-gray-400 text-sm mt-1">Panel de Administración</p>
         </div>
+
+        {/* Aviso de sesión expirada por inactividad */}
+        {sesionExpirada && (
+          <div className="bg-yellow-50 border border-yellow-300 rounded-xl px-4 py-3 mb-4 text-center">
+            <p className="text-yellow-700 text-sm font-medium">⏱️ Sesión cerrada por inactividad</p>
+            <p className="text-yellow-600 text-xs mt-1">Por seguridad, inicia sesión nuevamente.</p>
+          </div>
+        )}
 
         {/* Formulario */}
         <div className="space-y-4">
