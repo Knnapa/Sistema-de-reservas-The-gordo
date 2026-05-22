@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AdminSidebar from "./AdminSidebar";
+import { signOutAdmin } from "../services/adminAuthService";
 
 function AdminLayout({ active, children }) {
   const [collapsed, setCollapsed] = useState(false);
@@ -10,7 +11,7 @@ function AdminLayout({ active, children }) {
   const toggleSidebar = () => setCollapsed((value) => !value);
 
   const handleCerrarSesion = async () => {
-    localStorage.removeItem("adminToken");
+    await signOutAdmin();
     navigate("/admin/login");
   };
 
