@@ -23,10 +23,10 @@ dist-ssr
 *.sln
 *.sw?
 
-# # Variables de entorno (NUNCA subir a GitHub)
-# .env
-# .env.local
-# .env.production
+# Variables de entorno (NUNCA subir a GitHub)
+.env
+.env.local
+.env.production
 # Logs
 logs
 *.log

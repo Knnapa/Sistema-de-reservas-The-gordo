@@ -18,4 +18,18 @@ export default defineConfig([
       parserOptions: { ecmaFeatures: { jsx: true } },
     },
   },
+  // Playwright config y tests E2E: entorno Node
+  {
+    files: ['playwright.config.js', 'tests/**/*.{js,ts}'],
+    languageOptions: {
+      globals: { ...globals.node },
+    },
+  },
+  // Tests unitarios de Vitest: entorno browser + Node (process no es necesario aquí)
+  {
+    files: ['src/tests/**/*.{js,jsx}'],
+    languageOptions: {
+      globals: { ...globals.browser },
+    },
+  },
 ])

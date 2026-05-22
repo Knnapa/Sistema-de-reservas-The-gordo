@@ -13,6 +13,7 @@ import FormularioReserva from "../../components/FormularioReserva";
 import useAdminGuard from "../../hooks/useAdminGuard";
 import { signOutAdmin } from "../../services/adminAuthService";
 
+// eslint-disable-next-line no-unused-vars
 function fechaHoyFormateada() {
   return new Date().toLocaleDateString("es-CO", {
     weekday: "long",
@@ -22,6 +23,7 @@ function fechaHoyFormateada() {
   });
 }
 
+// eslint-disable-next-line no-unused-vars
 function capitalizar(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
